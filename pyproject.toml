@@ -1,0 +1,54 @@
+# important: install in editable mode
+[build-system]
+requires = [
+    "hatchling",        # build backend
+    "hatch-requirements-txt", # plugin, to parse requirements.txt
+]
+build-backend = "hatchling.build"
+
+
+[project]
+name = "Surf2Spot"
+description = "Surf2Spot: A Geometric Model for Prediction of Epitope and Binding Sites on Target Protein"
+requires-python = "~=3.9"
+authors = [{ name = "AnwZhao" }]
+# see both defined below
+dynamic = ["version", "dependencies"]
+
+[tool.hatch.version]
+path = "Surf2Spot/__init__.py"
+[tool.hatch.metadata.hooks.requirements_txt]
+files = ["requirements.in"]
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.mypy]
+check_untyped_defs = true
+
+# Ignore missing imports for packages with missing type stubs
+[[tool.mypy.overrides]]
+module = [
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+cache_dir = "/tmp/.common_pytest_cache"
+
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "/.devcontainer",
+    "/.github",
+    "/.idea",
+    "/.vscode",
+    "/.pytest_cache",
+    "/model",
+    "/test_NB",
+    "/test_HS"
+]
+
+[tool.hatch.build.targets.wheel]
+# should use packages from sdist section
+
+[project.scripts]
+Surf2Spot = "Surf2Spot.main:cli"

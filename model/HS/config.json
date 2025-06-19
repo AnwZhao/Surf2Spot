@@ -1,0 +1,13 @@
+{
+  "architectures": [
+    "HuggingFaceDGCNN"
+  ],
+  "k": 20,
+  "model_type": "dgcnn",
+  "output_dim": 1,
+  "output_dist_arr_dim": 32,
+  "output_progen2_dim": 16,
+  "pc_dim": 39,
+  "torch_dtype": "float32",
+  "transformers_version": "4.41.2"
+}
