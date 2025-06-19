@@ -18,9 +18,9 @@ Surf2Spot relies on external software/libraries to handle protein databank files
    git clone https://github.com/AnwZhao/Surf2Spot
    cd Surf2Spot
     ```
-    Download the msms(2.6.1), apbs(3.4.1), pdb2pqr(2.1.1) package to `./surf2spot/data/masif/extra_dependence` and install.
+    Download the msms(2.6.1), apbs(3.4.1), pdb2pqr(2.1.1) package to `./Surf2Spot/data/masif/extra_dependence` and install.
 
-   If the version used or directory name is not corresponding, please modify the directory name of the path in `./surf2spot/data/generate_surface.py`
+   If the version used or directory name is not corresponding, please modify the directory name of the path in `./Surf2Spot/data/generate_surface.py`
 
    ```python
    os.environ["LD_LIBRARY_PATH"] = os.path.join(os.path.dirname(os.path.abspath(__file__)),  'masif/extra_dependence/APBS-3.4.1/lib')  
@@ -85,29 +85,29 @@ C --> D[NB-draw]
 1. Antigen preprocessing
    Simply put the pdb files for analysis in the `test_NB/input` folder.
    ```shell
-    surf2spot  NB-preprocess  -i  test_NB/input  -o  test_NB/output  -ds  test_NB/chainsaw.tsv 
+    Surf2Spot  NB-preprocess  -i  test_NB/input  -o  test_NB/output  -ds  test_NB/chainsaw.tsv 
    ```
    If you only have the protein sequence, you only need to write the sequence into fasta file, and the model will automatically call esmfold to predict the structure.
    ```shell
-    surf2spot  NB-preprocess  --esm  test_NB/esm.fasta  -i  test_NB/input  -o  test_NB/output  -ds  test_NB/chainsaw.tsv 
+    Surf2Spot  NB-preprocess  --esm  test_NB/esm.fasta  -i  test_NB/input  -o  test_NB/output  -ds  test_NB/chainsaw.tsv 
    ```
 
 2. Feature engineering
     This step generates the characteristics of amino acids on the protein, including the embedding of prot5 and the domain partition results.
    ```shell
-   surf2spot  NB-craft  -i  test_NB/output  -s  test_NB/seq.fasta  -ds  test_NB/chainsaw.tsv  -emb  test_NB/seq_prottrans.h5    
+   Surf2Spot  NB-craft  -i  test_NB/output  -s  test_NB/seq.fasta  -ds  test_NB/chainsaw.tsv  -emb  test_NB/seq_prottrans.h5    
    ```
 
 3. Model prediction
     Perform model prediction and output point cloud prediction results of NAI epitopes.
    ```shell
-   surf2spot  NB-predict  -i  test_NB/output  -o  test_NB/predict  -emb  test_NB/seq_prottrans.h5  --model  model/NB/model.pt    
+   Surf2Spot  NB-predict  -i  test_NB/output  -o  test_NB/predict  -emb  test_NB/seq_prottrans.h5  --model  model/NB/model.pt    
    ```
 
 4. Result rendering and cluster analysis
     In this step, the predicted results of protein surface point cloud are mapped to amino acids, and the amino acids predicted as NAI epitopes are clustered to output the amino acid clusters that are finally suitable for designing nanobody.
    ```shell
-   surf2spot  NB-draw  -i  test_NB/output  -o  test_NB/predict    
+   Surf2Spot  NB-draw  -i  test_NB/output  -o  test_NB/predict    
    ```
    
 ---
@@ -123,29 +123,29 @@ C --> D[HS-draw]
 1. target protein preprocessing
     Simply put the pdb files for analysis in the `test_HS/input` folder.
    ```shell
-    surf2spot  HS-preprocess  -i  test_HS/input  -o  test_HS/output  -gpsite_dir  test_HS/GPscore 
+    Surf2Spot  HS-preprocess  -i  test_HS/input  -o  test_HS/output  -gpsite_dir  test_HS/GPscore 
    ```
     If you only have the protein sequence, you only need to write the sequence into fasta file, and the model will automatically call esmfold to predict the structure. 
    ```shell
-    surf2spot  HS-preprocess  --esm  test_HS/esm.fasta  -i  test_HS/input  -o  test_HS/output  -gpsite_dir  test_HS/GPscore 
+    Surf2Spot  HS-preprocess  --esm  test_HS/esm.fasta  -i  test_HS/input  -o  test_HS/output  -gpsite_dir  test_HS/GPscore 
    ```
    
 2. Feature engineering
     This step generates the characteristics of amino acids on the protein, including the embedding of prot5 and the PPI probabilistic enrichment site by GPSite.
    ```shell
-    surf2spot  HS-craft  -i  test_HS/output  -s  test_HS/seq.fasta  -emb  test_HS/seq_prottrans.h5  -gpsite_dir  test_HS/GPscore 
+    Surf2Spot  HS-craft  -i  test_HS/output  -s  test_HS/seq.fasta  -emb  test_HS/seq_prottrans.h5  -gpsite_dir  test_HS/GPscore 
    ```
 
 3. Model prediction
     Perform model prediction and output point cloud prediction results of PPI hotspots.
    ```shell
-    surf2spot  HS-predict  -i  test_HS/output  -o  test_HS/predict  -emb  test_HS/seq_prottrans.h5  --model  model/HS/model.pt 
+    Surf2Spot  HS-predict  -i  test_HS/output  -o  test_HS/predict  -emb  test_HS/seq_prottrans.h5  --model  model/HS/model.pt 
    ```
 
 4. Result rendering and cluster analysis
     In this step, the predicted results of protein surface point cloud are mapped to amino acids, and the amino acids predicted as PPI hotspots are clustered to output the amino acid clusters that are finally suitable for designing nanobody.
    ```shell
-   surf2spot  HS-draw  -i  test_HS/output  -o  test_HS/predict    
+   Surf2Spot  HS-draw  -i  test_HS/output  -o  test_HS/predict    
    ```
    *.csv and *_pre.pse are prediction result files, while *_cluster.pse represents the clustering of the prediction results. The selection of design anchors and hotspot residues can be guided by the clustering information in the *_cluster.pse file.
 
