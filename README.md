@@ -147,7 +147,7 @@ C --> D[HS-draw]
    ```shell
    surf2spot  HS-draw  -i  test_HS/output  -o  test_HS/predict    
    ```
-   
+   *.csv and *_pre.pse are prediction result files, while *_cluster.pse represents the clustering of the prediction results. The selection of design anchors and hotspot residues can be guided by the clustering information in the *_cluster.pse file.
 
  
 ## Data
