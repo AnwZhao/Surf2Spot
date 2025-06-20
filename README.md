@@ -81,6 +81,9 @@ A[NB-preprocess] --> B[NB-craft]
 B --> C[NB-predict]
 C --> D[NB-draw]
 ```
+```shell
+    conda  activate  surf2spot
+```
 
 1. Antigen preprocessing
    Simply put the pdb files for analysis in the `test_NB/input` folder.
@@ -118,6 +121,10 @@ graph LR
 A[HS-preprocess] --> B[HS-craft] 
 B --> C[HS-predict]
 C --> D[HS-draw]
+```
+
+```shell
+    conda  activate  surf2spot
 ```
 
 1. target protein preprocessing
