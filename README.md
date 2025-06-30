@@ -132,13 +132,14 @@ C --> D[HS-draw]
    ```shell
     Surf2Spot  HS-preprocess  -i  test_HS/input  -o  test_HS/preprocess  
    ```
+    Domain segmentation is used by default. If PPI enrichment segmentation is needed, please specify parameters`--split 2`. 
     If you only have the protein sequence, you only need to write the sequence into fasta file, and the model will automatically call esmfold to predict the structure. 
    ```shell
     Surf2Spot  HS-preprocess  --esm  test_HS/esm.fasta  -i  test_HS/input  -o  test_HS/preprocess 
    ```
    
 2. Feature engineering
-    This step generates the characteristics of amino acids on the protein, including the embedding of prot5 and the PPI probabilistic enrichment site by GPSite.
+    This step generates the characteristics of amino acids on the protein, including the embedding of prot5. Segmentation method `--split` should be consistent with preprocessing parameters.
    ```shell
     Surf2Spot  HS-craft  -i  test_HS/preprocess  
    ```
