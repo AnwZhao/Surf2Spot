@@ -6,3 +6,4 @@ cd ./surf2spot/data/model_emb
 git clone https://huggingface.co/Rostlab/prot_t5_xl_half_uniref50-enc
 rm -rf GPSite
 rm -rf Chainsaw
+export PATH=$PATH:$(pwd)/surf2spot/data/feature_extraction/
