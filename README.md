@@ -39,7 +39,7 @@ Surf2Spot relies on external software/libraries to handle protein databank files
 2. Prepare the environment
 We recommend using conda to substantially facilitate installation of all Python dependencies. 
 Cuda version 11.8 and above is required. 
-In order to avoid environmental conflicts, two different conda environments need to be built. Considering the version problems of some installation packages, please install python versions 3.7 and 3.10 respectively.
+In order to avoid environmental conflicts, two different conda environments need to be built. Considering the version problems of some installation packages, please install python versions 3.7 and 3.9 respectively.
    ```shell
     conda  create  -n  surf2spot_tools  python=3.7    
     pip  install  "fair-esm[esmfold]"  
