@@ -2,20 +2,20 @@ import os
 import typer
 import subprocess
 from pathlib import Path
-from surf2spot.tools.path_check import path_exists, mk_dir
-from surf2spot.data.get_domain import get_domain_tsv
-from surf2spot.data.preprocess_single_chain import get_single_chain
-from surf2spot.data.get_atom_feature import atom_feature_engineering
-from surf2spot.data.extract_sequences import extract_sequences_from_pdb
-from surf2spot.data.get_prottrans_embed import run_prottrans
-from surf2spot.data.get_surface_partzone_antighs import NB_surfpart
-from surf2spot.predict.get_data_list_antighs import NB_predict
-from surf2spot.draw.draw_predict_antighs import NB_draw
+from Surf2Spot.tools.path_check import path_exists, mk_dir
+from Surf2Spot.data.get_domain import get_domain_tsv
+from Surf2Spot.data.preprocess_single_chain import get_single_chain
+from Surf2Spot.data.get_atom_feature import atom_feature_engineering
+from Surf2Spot.data.extract_sequences import extract_sequences_from_pdb
+from Surf2Spot.data.get_prottrans_embed import run_prottrans
+from Surf2Spot.data.get_surface_partzone_antighs import NB_surfpart
+from Surf2Spot.predict.get_data_list_antighs import NB_predict
+from Surf2Spot.draw.draw_predict_antighs import NB_draw
 
-from surf2spot.data.batch_predict_from_pdb_and_dssp_surface import get_gpsite_split
-from surf2spot.data.get_surface_partzone_hsfilter import HS_surfpart
-from surf2spot.predict.get_data_list_hsfilter import HS_predict
-from surf2spot.draw.draw_predict_hsfilter import HS_draw
+from Surf2Spot.data.batch_predict_from_pdb_and_dssp_surface import get_gpsite_split
+from Surf2Spot.data.get_surface_partzone_hsfilter import HS_surfpart
+from Surf2Spot.predict.get_data_list_hsfilter import HS_predict
+from Surf2Spot.draw.draw_predict_hsfilter import HS_draw
 
 
 def run_NB_preprocess(
