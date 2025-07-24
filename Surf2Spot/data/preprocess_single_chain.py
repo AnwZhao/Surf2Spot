@@ -72,9 +72,9 @@ def get_inter_chain_pdb(input_pdb, chain_pro, output_pdb):
 def check_aa_in_selection(input_pdb, chain_id):
     cmd.reinitialize()
     cmd.load(input_pdb)  # 替换为您的 PDB 文件名
-    cmd.select(chain_id,f'(resn ala+arg+asn+asp+cys+glu+gln+gly+his+ile+leu+lys+met+phe+pro+ser+thr+trp+tyr+val) and chain {chain_id}')
+    cmd.select('ccc_'+ chain_id,f'(resn ala+arg+asn+asp+cys+glu+gln+gly+his+ile+leu+lys+met+phe+pro+ser+thr+trp+tyr+val) and chain {chain_id}')
     # 获取selection中的所有原子模型
-    atom_num = cmd.count_atoms(chain_id)
+    atom_num = cmd.count_atoms('ccc_'+ chain_id)
     if atom_num > 0:
         return True
     else:
