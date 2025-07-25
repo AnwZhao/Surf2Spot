@@ -32,17 +32,45 @@ maxASA = {
     'V': 174.0   # Valine
 }
 
+def insert_cryst1_line(pdb_path, cryst1_line="CRYST1"):
+    with open(pdb_path, 'r') as f:
+        lines = f.readlines()
+    
+    # 确保 CRYST1 行是正确的 80 列宽格式
+    if not cryst1_line.endswith('\n'):
+        cryst1_line += '\n'
+    lines.insert(0, cryst1_line)
+
+    with open(pdb_path, 'w') as f:
+        f.writelines(lines)
+
+
+def remove_cryst1_line(pdb_path):
+    with open(pdb_path, 'r') as f:
+        lines = f.readlines()
+
+    # 如果第一行是 CRYST1，则移除
+    if lines and lines[0].startswith('CRYST1'):
+        lines = lines[1:]
+
+    with open(pdb_path, 'w') as f:
+        f.writelines(lines)
+
+
+
+
 def extract_atom_coordinates(pdb_file):
     """
     从PDB文件中提取每个氨基酸残基的原子坐标，并返回一个列表。
     """
+    insert_cryst1_line(pdb_file)
     parser = PDB.PDBParser(QUIET=True)
     structure = parser.get_structure('protein', pdb_file)
     atom_coords = []
     
     # 计算DSSP
     model = structure[0]
-    dssp = DSSP(model, pdb_file)
+    dssp = DSSP(model, pdb_file, dssp=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'feature_extraction/mkdssp'))
     
     # 获取标准化的溶剂可及表面积
     normalized_asa = []
@@ -71,8 +99,9 @@ def extract_atom_coordinates(pdb_file):
                             'b_factor':atom.get_bfactor()
                         })
                     i += 1
-
+    remove_cryst1_line(pdb_file)
     return atom_coords
+
 
 def extract_dssp_info(dssp_file):
     """
@@ -104,15 +133,9 @@ def extract_dssp_info(dssp_file):
             if line.startswith("  #  RESIDUE AA STRUCTURE"):
                 start_reading = True
     return dssp_info
-'''
-def load_binding_data(binding_file):
-    """
-    读取binding信息的CSV文件并返回一个字典。
-    """
-    df = pd.read_csv(binding_file)
-    binding_info = df.set_index('No').to_dict('index')
-    return binding_info
-'''
+
+
+
 def save_combined_info_to_csv(atom_coords, dssp_info, output_file):
     """
     将原子坐标、DSSP信息和binding信息结合后保存到CSV文件。
@@ -206,34 +229,6 @@ def to_one_hot(input_file,output_file):
     print(f"One-hot encoded information saved to {output_file}")
 
 
-'''
-def main():
-    parser = argparse.ArgumentParser(description='input parse')
-    parser.add_argument("-i",'--input_dir', type=str, metavar='', required= True,
-                        help='(Please enter an absolute path)')         
-    parser.add_argument("-o", '--out_dir', type=str, metavar='',
-                        help='Directory of output files.(Please enter an absolute path)', required=True)
-    args = parser.parse_args()
-
-    out2_path = args.out_dir  
-
-    for ply in os.listdir(out2_path):
-        #print('ply',ply)
-        if ply.endswith('_all_5.0.ply') :
-            pdb_name = ply.split('_all_')[0]
-            print(pdb_name)
-            if not os.path.exists(os.path.join(out2_path,pdb_name+'_combined_info_onehot_atom.csv')):
-                dssp_file = os.path.join(args.input_dir,pdb_name+'.dssp')
-                pdb_file = os.path.join(args.input_dir,pdb_name+'.pdb')
-                os.system('mkdssp -i %s -o %s' %(pdb_file,dssp_file))
-                output1_file = os.path.join(out2_path,pdb_name+'_combined_info_onehot_atom.csv')
-                output2_file = os.path.join(out2_path,pdb_name+'_combined_info_onehot_atom.csv')
-        
-                run(pdb_file, dssp_file, output1_file)
-                to_one_hot(output1_file,output2_file)
-
-main()
-'''
 
 def atom_feature_engineering(output_dir):
     out2_path = output_dir
@@ -245,7 +240,8 @@ def atom_feature_engineering(output_dir):
             if not os.path.exists(os.path.join(out2_path,pdb_name+'_combined_info_onehot_atom.csv')):
                 dssp_file = os.path.join(output_dir,pdb_name+'.dssp')
                 pdb_file = os.path.join(output_dir,pdb_name+'.pdb')
-                os.system('mkdssp -i %s -o %s' %(pdb_file,dssp_file))
+                mkdssp_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'feature_extraction/mkdssp')
+                os.system(f'{mkdssp_path} -i %s -o %s' %(pdb_file,dssp_file))
                 output1_file = os.path.join(out2_path,pdb_name+'_combined_info_onehot_atom.csv')
                 output2_file = os.path.join(out2_path,pdb_name+'_combined_info_onehot_atom.csv')
         
