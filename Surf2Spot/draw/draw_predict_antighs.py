@@ -326,5 +326,5 @@ def NB_draw(pdb_dir, ply_dir):
             aa_score_list.append(aa_score)
             aa_score_0_1_list.append(aa_score_0_1)    
             color_pse(pdb_file, pre_ply_path, aa_score, best_threshold, out_name)
-            df = pd.DataFrame({'aa_id':range(1, len(aa_score)+1),'score':aa_score})
+            df = pd.DataFrame({'aa_id':range(1, len(aa_score)+1),'score':aa_score, 'best_threshold':[best_threshold]*len(aa_score), 'hotspot_bool':aa_score_0_1})
             df.to_csv(os.path.join(pre_ply_path, out_name+'.csv'),sep=',',index=False)
