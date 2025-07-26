@@ -195,77 +195,32 @@ def evaluate_with_threshold(aa_score, threshold):
     return aa_score_0_1
 
 
-'''
-def main():
-    parser = argparse.ArgumentParser(description='input parse')
-    parser.add_argument('--pdb_dir', type=str, metavar='', required= True,
-                        help='(Please enter an absolute path)')
-    parser.add_argument('--ply_dir', type=str, metavar='', required= True,
-                        help='Directory of output files.(Please enter an absolute path)')
-    args = parser.parse_args()
-    
-    pdb_path = args.pdb_dir
-    pre_ply_path = args.ply_dir
-    
-    best_threshold_list = []
-    aa_score_list = []
-    aa_score_0_1_list = []
+def rescale_with_threshold(data, threshold=0.01):
 
-    for pre_ply in os.listdir(pre_ply_path):
-        if pre_ply.endswith('.ply'):
-            ply_path = os.path.join(pre_ply_path,pre_ply)
-            pc_coordinates, pc_score = read_ply_file(ply_path)
+    if not data:
+        return []
 
-            # 示例使用
-            if '_domain_' in pre_ply:
-                pdb_name = pre_ply.split('_domain_')[0]
-                out_name = pdb_name + pre_ply.split('_filtered')[-1].split('.')[0] 
+    min_low = min(x for x in data if x <= threshold) if any(x <= threshold for x in data) else threshold
+    max_high = max(x for x in data if x > threshold) if any(x > threshold for x in data) else threshold
+
+    rescaled = []
+    for x in data:
+        if x <= threshold:
+            # 缩放到 [0, 0.5]
+            if threshold == min_low:
+                val = 0.5 if x == threshold else 0.0  # 避免除以0
             else:
-                pdb_name = pre_ply.split('_pred')[0]
-                out_name = pdb_name
+                val = (x - min_low) / (threshold - min_low) * 0.5
+        else:
+            # 缩放到 [0.5, 1.0]
+            if max_high == threshold:
+                val = 1.0 if x == max_high else 0.5  # 避免除以0
+            else:
+                val = 0.5 + (x - threshold) / (max_high - threshold) * 0.5
+        rescaled.append(val)
 
-            pdb_file = os.path.join(pdb_path,pdb_name+'.pdb')
-            chain_id = pdb_name.split('_')[1]  # 替换为你要提取的链编号
-            atom_coordinates_dict,aa_num = extract_coordinates(pdb_file, chain_id)
-            print('---------pdb_name---------',pre_ply.split('_pred')[0])        
-            aa_score = [0]*aa_num        
-            aa_score_dup = [0]*aa_num        
-            atom_coordinates = []
-            for key in atom_coordinates_dict.keys():
-                atom_coordinates.append(list(key))
-            atom_coordinates = np.array(atom_coordinates)        
-            for i in range(len(atom_coordinates)):
-                if find_nearest_point(atom_coordinates, pc_coordinates, i)==False:
-                    pass
-                else:
-                    nearest_point_in_pc, nearest_index_in_pc = find_nearest_point(atom_coordinates, pc_coordinates, i)   
-                    resi_id = atom_coordinates_dict[tuple(atom_coordinates[i])] #resi_id
-                    resi_score = pc_score[nearest_index_in_pc]  #resi_score
-                    aa_score[resi_id - 1] += resi_score
-                    aa_score_dup[resi_id - 1] += 1
-        
-            for s in range(len(aa_score)):
-                if aa_score_dup[s] != 0:
-                    if aa_score_dup[s] >= 1:   #  5  0.420448120312251
-                        aa_score[s] = round(aa_score[s]/aa_score_dup[s],3)
-                    else:
-                        aa_score[s] = 0
-            aa_score = torch.Tensor(aa_score).numpy().tolist()
-            
-            best_threshold = 0.01
-            count = len([x for x in aa_score if x > best_threshold])
-            if count > 40:
-                best_threshold = sorted(aa_score,reverse=True)[39]
-                
-            aa_score_0_1 = evaluate_with_threshold(aa_score, best_threshold)
-            aa_score_list.append(aa_score)
-            aa_score_0_1_list.append(aa_score_0_1)    
-            color_pse(pdb_file, pre_ply_path, aa_score, best_threshold, out_name)
-            df = pd.DataFrame({'aa_id':range(1, len(aa_score)+1),'score':aa_score})
-            df.to_csv(os.path.join(pre_ply_path, out_name+'.csv'),sep=',',index=False)
-        
-main()
-'''
+    return rescaled
+
 
 def HS_draw(pdb_dir, ply_dir):  
     pdb_path = pdb_dir
@@ -325,7 +280,8 @@ def HS_draw(pdb_dir, ply_dir):
             aa_score_list.append(aa_score)
             aa_score_0_1_list.append(aa_score_0_1)    
             color_pse(pdb_file, pre_ply_path, aa_score, best_threshold, out_name)
-            df = pd.DataFrame({'aa_id':range(1, len(aa_score)+1),'score':aa_score, 'best_threshold':[best_threshold]*len(aa_score), 'hotspot_bool':aa_score_0_1})
+            aa_score_scaled = rescale_with_threshold(aa_score, best_threshold)
+            df = pd.DataFrame({'aa_id':range(1, len(aa_score)+1),'score':aa_score_scaled, 'hotspot_bool':aa_score_0_1})
             df.to_csv(os.path.join(pre_ply_path, out_name+'.csv'),sep=',',index=False)
         
 
