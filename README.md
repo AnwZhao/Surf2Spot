@@ -54,7 +54,8 @@ In order to avoid environmental conflicts, two different conda environments need
    ```shell
     conda  create  -n  surf2spot  python=3.9  
     pip  install  torch==2.1.1  torchvision==0.16.1  torchaudio==2.1.1  --index-url  https://download.pytorch.org/whl/cu118  
-    conda  install  -c  conda-forge  pymol-open-source=3.0.0  
+    conda  install  -c  conda-forge  pymol-open-source=3.0.0
+    conda install -c ostrokach dssp
     pip  install  https://data.pyg.org/whl/torch-2.1.0%2Bcu118/torch_cluster-1.6.3%2Bpt21cu118-cp39-cp39-linux_x86_64.whl  
     pip  install  https://data.pyg.org/whl/torch-2.1.0%2Bcu118/torch_scatter-2.1.2%2Bpt21cu118-cp39-cp39-linux_x86_64.whl  
     pip  install  https://data.pyg.org/whl/torch-2.1.0%2Bcu118/torch_sparse-0.6.18%2Bpt21cu118-cp39-cp39-linux_x86_64.whl  
