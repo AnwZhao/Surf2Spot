@@ -70,7 +70,7 @@ def extract_atom_coordinates(pdb_file):
     
     # 计算DSSP
     model = structure[0]
-    dssp = DSSP(model, pdb_file, dssp=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'feature_extraction/mkdssp'))
+    dssp = DSSP(model, pdb_file)
     
     # 获取标准化的溶剂可及表面积
     normalized_asa = []
@@ -240,8 +240,7 @@ def atom_feature_engineering(output_dir):
             if not os.path.exists(os.path.join(out2_path,pdb_name+'_combined_info_onehot_atom.csv')):
                 dssp_file = os.path.join(output_dir,pdb_name+'.dssp')
                 pdb_file = os.path.join(output_dir,pdb_name+'.pdb')
-                mkdssp_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'feature_extraction/mkdssp')
-                os.system(f'{mkdssp_path} -i %s -o %s' %(pdb_file,dssp_file))
+                os.system(f'mkdssp -i %s -o %s' %(pdb_file,dssp_file))
                 output1_file = os.path.join(out2_path,pdb_name+'_combined_info_onehot_atom.csv')
                 output2_file = os.path.join(out2_path,pdb_name+'_combined_info_onehot_atom.csv')
         
