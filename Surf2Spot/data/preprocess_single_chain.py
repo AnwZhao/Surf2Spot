@@ -1,4 +1,5 @@
 from Bio import PDB
+from Bio.PDB import PDBParser, PDBIO
 import os
 import argparse
 from pymol import cmd, stored
@@ -21,6 +22,29 @@ def get_chain_length(pdb_file, chain_id):
     # 返回链的氨基酸数量
     return len(list(chain.get_residues()))
 
+
+def remove_hydrogens(input_pdb, output_pdb):
+    # 创建 PDB 解析器
+    parser = PDBParser()
+    structure = parser.get_structure("protein", input_pdb)
+
+    # 遍历所有原子，移除氢原子
+    for model in structure:
+        for chain in model:
+            for residue in chain:
+                atoms_to_remove = []
+                for atom in residue:
+                    if atom.element == "H":  # 判断是否为氢原子
+                        atoms_to_remove.append(atom.get_id())
+                for atom_id in atoms_to_remove:
+                    residue.detach_child(atom_id)
+
+    # 保存处理后的 PDB 文件
+    io = PDBIO()
+    io.set_structure(structure)
+    io.save(output_pdb)
+
+
 def remove_HOH(input_pdb, output_pdb):  
     cmd.reinitialize()
     
@@ -29,6 +53,7 @@ def remove_HOH(input_pdb, output_pdb):
     # 去除水分子
     cmd.remove('resn HOH')
     cmd.save(output_pdb, 'all')
+    remove_hydrogens(output_pdb, output_pdb)
 
 
 def parse_pdb_file(pdb_file):
@@ -120,40 +145,6 @@ def get_chain_ids(pdb_file):
     return sorted(chain_ids)
     
 
-'''
-def main():
-    parser = argparse.ArgumentParser(description='input parse')
-    parser.add_argument('-i','--input_dir', type=str, metavar='', required= True,
-                        help='(Please enter an absolute path)')
-    parser.add_argument('-o','--out_dir', type=str, metavar='', required= True,
-                        help='Directory of output files.(Please enter an absolute path)')
-    args = parser.parse_args()
-
-    input_path = args.input_dir
-    output_path_pro = args.out_dir
-
-    if not os.path.exists(output_path_pro):
-        os.makedirs(output_path_pro)
-        
-
-    for f in os.listdir(input_path):
-        if f.endswith('.pdb'):
-            pdb_file = os.path.join(input_path, f)
-            chain_list = get_chain_ids(pdb_file)
-            print(f)
-            for c in chain_list:
-                pdb_c = f.split('.')[0]
-                pdb = f.split('.')[0]
-                if check_aa_in_selection(pdb_file, c):
-                    input_pdb = pdb_file
-                    output_pdb = os.path.join(output_path_pro, pdb+f'_{c}.pdb')
-                    get_inter_chain_pdb(input_pdb, c, output_pdb)
-                    remove_HOH(output_pdb, output_pdb)
-                    renum_pdb_resi_num(output_pdb,c,output_pdb)
-                    print('get protein_chain', c)
-            
-main()
-'''
 
 def get_single_chain(input_dir, output_dir):
     input_path = input_dir
