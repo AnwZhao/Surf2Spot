@@ -150,13 +150,12 @@ def get_partzone_ply(pdb_path, target_coords_dict, out_path, threshold = 5.0):
             output_ply = os.path.join(pdb_path, pdb_c + '_all_5.0_filtered.ply')
         else:
             output_ply = os.path.join(pdb_path, pdb_c + '_all_5.0_filtered_domain_'+key.split('_domain')[-1]+'.ply')
-        target_coords = target_coords_dict[key]
-        
-        header, vertices, faces = read_ply(input_ply)
-    
-        filtered_vertices, filtered_faces = filter_vertices(vertices, faces, target_coords, threshold)
-    
-        write_ply(output_ply, header, filtered_vertices, filtered_faces)    
+            
+        if not os.path.exists(output_ply):
+            target_coords = target_coords_dict[key]
+            header, vertices, faces = read_ply(input_ply)
+            filtered_vertices, filtered_faces = filter_vertices(vertices, faces, target_coords, threshold)
+            write_ply(output_ply, header, filtered_vertices, filtered_faces)     
     
 
 # check the cloud point number
