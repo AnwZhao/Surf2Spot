@@ -39,7 +39,8 @@ def run_NB_preprocess(
     else:
         if path_exists(esm_fasta):
             print('===================running esmfold===================')
-            subprocess.run(f"conda run -n surf2spot_tools esm-fold -i {esm_fasta} -o {input_dir} --cpu-only", shell=True)
+            esm_code = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tools/predict_esm.py')
+            subprocess.run(f"conda run -n surf2spot_tools python {esm_code} -i {esm_fasta} -o {input_dir} ", shell=True)
             get_single_chain(input_dir, output_dir)
             get_domain_tsv(output_dir, domain_out_tsv, min_domain_length)
             
@@ -129,7 +130,8 @@ def run_HS_preprocess(
         else:
             if path_exists(esm_fasta):
                 print('===================running esmfold===================')
-                subprocess.run(f"conda run -n surf2spot_tools esm-fold -i {esm_fasta} -o {input_dir} --cpu-only", shell=True)
+                esm_code = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tools/predict_esm.py')
+                subprocess.run(f"conda run -n surf2spot_tools python {esm_code} -i {esm_fasta} -o {input_dir} ", shell=True)
                 get_single_chain(input_dir, output_dir)
                 get_gpsite_split(output_dir, domain_out_dir)
 
@@ -142,7 +144,8 @@ def run_HS_preprocess(
         else:
             if path_exists(esm_fasta):
                 print('===================running esmfold===================')
-                subprocess.run(f"conda run -n surf2spot_tools esm-fold -i {esm_fasta} -o {input_dir} --cpu-only", shell=True)
+                esm_code = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tools/predict_esm.py')
+                subprocess.run(f"conda run -n surf2spot_tools python {esm_code} -i {esm_fasta} -o {input_dir} ", shell=True)
                 get_single_chain(input_dir, output_dir)
                 get_domain_tsv(output_dir, domain_out_tsv, min_domain_length)
 
