@@ -196,6 +196,8 @@ def evaluate_with_threshold(aa_score, threshold):
     return aa_score_0_1
 
 
+
+
 def rescale_with_threshold(data, threshold=0.01):
 
     if not data:
@@ -222,8 +224,7 @@ def rescale_with_threshold(data, threshold=0.01):
 
     return rescaled
 
-
-
+    
 def NB_draw(pdb_dir, ply_dir):    
     pdb_path = pdb_dir
     pre_ply_path = ply_dir
@@ -267,16 +268,16 @@ def NB_draw(pdb_dir, ply_dir):
         
             for s in range(len(aa_score)):
                 if aa_score_dup[s] != 0:
-                    if aa_score_dup[s] >= 1:   #  5  0.420448120312251
+                    if aa_score_dup[s] >= 2:   #  5  0.420448120312251
                         aa_score[s] = round(aa_score[s]/aa_score_dup[s],3)
                     else:
                         aa_score[s] = 0
             aa_score = torch.Tensor(aa_score).numpy().tolist()
             
-            best_threshold = 0.01
+            best_threshold = 0.1
             count = len([x for x in aa_score if x > best_threshold])
-            if count > 40:
-                best_threshold = sorted(aa_score,reverse=True)[39]
+            if count > 15:
+                best_threshold = sorted(aa_score,reverse=True)[14]
                 
             aa_score_0_1 = evaluate_with_threshold(aa_score, best_threshold)
             aa_score_list.append(aa_score)
