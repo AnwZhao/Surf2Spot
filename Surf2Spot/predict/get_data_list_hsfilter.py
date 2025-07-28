@@ -266,11 +266,40 @@ class DGCNN(nn.Module):
         return out
 
 
+
+def rescale_with_threshold(data, threshold=0.01):
+
+    if not data:
+        return []
+
+    min_low = min(x for x in data if x <= threshold) if any(x <= threshold for x in data) else threshold
+    max_high = max(x for x in data if x > threshold) if any(x > threshold for x in data) else threshold
+
+    rescaled = []
+    for x in data:
+        if x <= threshold:
+            # 缩放到 [0, 0.5]
+            if threshold == min_low:
+                val = 0.5 if x == threshold else 0.0  # 避免除以0
+            else:
+                val = (x - min_low) / (threshold - min_low) * 0.5
+        else:
+            # 缩放到 [0.5, 1.0]
+            if max_high == threshold:
+                val = 1.0 if x == max_high else 0.5  # 避免除以0
+            else:
+                val = 0.5 + (x - threshold) / (max_high - threshold) * 0.5
+        rescaled.append(val)
+
+    return rescaled
+
+
 def run_model(model, data_loader, device, threshold):
     model.eval()
     y_pred = []
     y_prob = []
     y_pred_out = []
+    y_prob_out = []
     
     with torch.no_grad():
         for data in data_loader:
@@ -279,25 +308,30 @@ def run_model(model, data_loader, device, threshold):
             #probs = torch.sigmoid(output).squeeze()
             probs = output.squeeze()
             preds = (probs > threshold).float()
+            scaled_threshold = threshold
             
             #检查转为 1 的元素个数
             num_positive = preds.sum().item()
             num_positive_threshold = 40
             if num_positive < num_positive_threshold:
                 # 获取前30个最大概率的索引
-                top_k_indices = torch.topk(probs, num_positive_threshold).indices
+                top_k_values, top_k_indices = torch.topk(probs, num_positive_threshold)
                 # 初始化全零的 preds
                 preds = torch.zeros_like(probs)
                 # 将前30个最大概率的对应位置设置为 1
                 preds[top_k_indices] = 1.0
+                scaled_threshold = top_k_values[num_positive_threshold - 1].item()
 
             y_pred.extend(preds.cpu().numpy())
             y_pred_out.append(preds.cpu().numpy())
             y_prob.extend(probs.cpu().numpy())
 
-    return y_pred_out
+            probs_scaled = np.array(rescale_with_threshold(list(probs.cpu().numpy()), scaled_threshold))
+            y_prob_out.append(probs_scaled)
 
+    return y_pred_out, y_prob_out
 
+'''
 def color_pre(in_ply,out_ply,pc_score_list):
     pc_score_list = [-i for i in pc_score_list]
     # 读取 PLY 文件
@@ -321,9 +355,64 @@ def color_pre(in_ply,out_ply,pc_score_list):
     # 写入新的 PLY 文件
     with open(out_ply, 'w') as file:
         file.writelines(lines)
-        
+'''
 
-def draw_ply(data_path, test_pdb_name_list, y_pred, out_path):
+def color_pre(input_ply_path, output_ply_path, probs, preds):
+    probs = [-i for i in probs]
+    preds = [-i for i in preds]
+    with open(input_ply_path, 'r') as f:
+        lines = f.readlines()
+
+    # Step 1: 解析 header
+    header = []
+    vertex_count = 0
+    face_count = 0
+    header_end_index = 0
+    for i, line in enumerate(lines):
+        header.append(line)
+        if line.startswith('element vertex'):
+            vertex_count = int(line.strip().split()[-1])
+        if line.startswith('element face'):
+            face_count = int(line.strip().split()[-1])
+        if line.strip() == 'end_header':
+            header_end_index = i
+            break
+
+    # Step 2: 读取 vertex 和 face 数据
+    vertex_lines = lines[header_end_index + 1: header_end_index + 1 + vertex_count]
+    face_lines = lines[header_end_index + 1 + vertex_count:]
+
+    # Step 3: 解析顶点属性
+    vertex_data = np.array([[float(x) for x in line.strip().split()] for line in vertex_lines])
+
+    hotspot_probs = np.array(probs)
+    hotspot_preds = np.array(preds)
+    assert len(hotspot_probs) == vertex_count, "Length of hotspot_probs must match number of vertices"
+
+    # Step 5: 拼接新属性
+    new_vertex_data = np.hstack((vertex_data, hotspot_probs[:, np.newaxis], hotspot_preds[:, np.newaxis]))
+
+    # Step 6: 构造新 header
+    new_header = []
+    for line in header:
+        if line.startswith('property float si'):
+            new_header.append(line)
+            new_header.append('property float hsprob\n')  # 加在 si 后
+            new_header.append('property float hspred\n')
+        else:
+            new_header.append(line)
+
+    # Step 7: 保存新的 ply
+    with open(output_ply_path, 'w') as f:
+        for line in new_header:
+            f.write(line)
+        for row in new_vertex_data:
+            f.write(' '.join(f'{val:.6f}' for val in row) + '\n')
+        for line in face_lines:
+            f.write(line)
+
+
+def draw_ply(data_path, test_pdb_name_list, y_pred, y_prob, out_path):
     for i in range(len(y_pred)):
         test_ply = test_pdb_name_list[i].split('/')[-1]    # 1kxq_A_all_5.0_filtered_domain_1.ply  1mel_L_all_5.0_filtered.ply
         test_ply_path = os.path.join(data_path, test_ply)   
@@ -331,8 +420,7 @@ def draw_ply(data_path, test_pdb_name_list, y_pred, out_path):
             out_ply_path = os.path.join(out_path, test_ply.split('_all_')[0] + '_domain_' + test_ply.split('_domain_')[-1].split('.')[0] + '_pred.ply')  ## 1kxq_A_domain_1_pred.ply
         else:
             out_ply_path = os.path.join(out_path, test_ply.split('_all_')[0] + '_pred.ply')
-        color_pre(test_ply_path, out_ply_path, y_pred[i].tolist())
-
+        color_pre(test_ply_path, out_ply_path, y_prob[i].tolist(), y_pred[i].tolist())
 
 
 
@@ -374,9 +462,9 @@ def HS_predict(input_dir, output_dir, emb, model, threshold):
     model.to(device)
     model.eval()
     print('running model')
-    y_pred = run_model(model, data_loader, device, threshold)
+    y_pred, y_prob = run_model(model, data_loader, device, threshold)
     print('finish model')
-    draw_ply(data_path, protein_files, y_pred, predict_path)
+    draw_ply(data_path, protein_files, y_pred, y_prob, predict_path)
     print('done.')
 
 
