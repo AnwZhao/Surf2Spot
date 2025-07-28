@@ -62,7 +62,7 @@ def read_ply_file(file_path):
         lines = file.readlines()
     vertex_section = False
     xyz_data = []
-    hbond_data = []
+    hsprob_data = []
     for line in lines:
         if line.strip() == "end_header":
             vertex_section = True
@@ -73,11 +73,11 @@ def read_ply_file(file_path):
                 x = float(parts[0])
                 y = float(parts[1])
                 z = float(parts[2])
-                hbond = float(parts[4])
+                hsprob = float(parts[10])
                 xyz_data.append([x, y, z])
-                hbond_data.append(hbond)
-    hbond_data = [-i for i in hbond_data]
-    return np.array(xyz_data), hbond_data
+                hsprob_data.append(hsprob)
+    hsprob_data = [-i for i in hsprob_data]
+    return np.array(xyz_data), hsprob_data
 
 
 def color_pse(pdb_f,out_path,score_list,best_threshold,out_name):
@@ -195,6 +195,7 @@ def evaluate_with_threshold(aa_score, threshold):
     return aa_score_0_1
 
 
+
 def rescale_with_threshold(data, threshold=0.01):
 
     if not data:
@@ -231,7 +232,7 @@ def HS_draw(pdb_dir, ply_dir):
     aa_score_0_1_list = []
 
     for pre_ply in os.listdir(pre_ply_path):
-        if pre_ply.endswith('.ply'):
+        if pre_ply.endswith('_pred.ply'):
             ply_path = os.path.join(pre_ply_path,pre_ply)
             pc_coordinates, pc_score = read_ply_file(ply_path)
 
@@ -265,16 +266,16 @@ def HS_draw(pdb_dir, ply_dir):
         
             for s in range(len(aa_score)):
                 if aa_score_dup[s] != 0:
-                    if aa_score_dup[s] >= 1:   #  5  0.420448120312251
+                    if aa_score_dup[s] >= 2:   #  5  0.420448120312251
                         aa_score[s] = round(aa_score[s]/aa_score_dup[s],3)
                     else:
                         aa_score[s] = 0
             aa_score = torch.Tensor(aa_score).numpy().tolist()
             
-            best_threshold = 0.01
+            best_threshold = 0.1
             count = len([x for x in aa_score if x > best_threshold])
-            if count > 40:
-                best_threshold = sorted(aa_score,reverse=True)[39]
+            if count > 10:
+                best_threshold = sorted(aa_score,reverse=True)[9]
                 
             aa_score_0_1 = evaluate_with_threshold(aa_score, best_threshold)
             aa_score_list.append(aa_score)
