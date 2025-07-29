@@ -158,7 +158,9 @@ C --> D[HS-draw]
    ```
    *.csv and *_pre.pse are prediction result files, while *_cluster.pse represents the clustering of the prediction results. The selection of design anchors and hotspot residues can be guided by the clustering information in the *_cluster.pse file.
 
- 
+## visualization
+We prepared the corresponding target protein/antigen id and the [original pdb file](https://huggingface.co/datasets/anwzhao/Surf2Spot_raw_data).
+Files with the suffix `.pse` `.ply` can be visualized in pymol, and plug-ins for visualizing `.ply` results can be found in [Surf2Spot_pymol_plugin](https://github.com/AnwZhao/Surf2Spot_pymol_plugin).
 ## Data
 We prepared the corresponding target protein/antigen id and the [original pdb file](https://huggingface.co/datasets/anwzhao/Surf2Spot_raw_data).
 If it's inconvenient for you to preprocess the data, we also provided the [processed data](https://huggingface.co/datasets/anwzhao/Surf2Spot_data).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
