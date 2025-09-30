@@ -322,8 +322,8 @@ def run_model(model, data_loader, device, threshold):
             output = model(data)
             #probs = torch.sigmoid(output).squeeze()
             probs = output.squeeze()
+            
             preds = (probs > threshold).float()
-            scaled_threshold = threshold
             
             #检查转为 1 的元素个数
             num_positive = preds.sum().item()
@@ -333,49 +333,49 @@ def run_model(model, data_loader, device, threshold):
             if num*0.5 <= num_positive_threshold:
                 num_positive_threshold = round(num*0.5)
             
-            if num_positive < num_positive_threshold:
+            if num_positive < num_positive_threshold :
                 # 获取前30个最大概率的索引
-                top_k_values, top_k_indices = torch.topk(probs, num_positive_threshold)
+                top_k_indices = torch.topk(probs, num_positive_threshold).indices
                 # 初始化全零的 preds
                 preds = torch.zeros_like(probs)
                 # 将前30个最大概率的对应位置设置为 1
                 preds[top_k_indices] = 1.0
-                scaled_threshold = top_k_values[num_positive_threshold - 1].item()
 
             y_pred.extend(preds.cpu().numpy())
             y_pred_out.append(preds.cpu().numpy())
             y_prob.extend(probs.cpu().numpy())
-
-            probs_scaled = np.array(rescale_with_threshold(list(probs.cpu().numpy()), scaled_threshold))
-            y_prob_out.append(probs_scaled)
+            y_prob_out.append(probs.cpu().numpy())
 
     return y_pred_out, y_prob_out
 
-def rescale_with_threshold(data, threshold=0.01):
+def color_pre(in_ply,out_ply,pc_score_list):
+    pc_score_list = [-i for i in pc_score_list]
+    # 读取 PLY 文件
+    with open(in_ply, 'r') as file:
+        lines = file.readlines()
 
-    if not data:
-        return []
+    # 查找数据段的开始和结束行
+    start_idx = None
+    end_idx = None
+    for idx, line in enumerate(lines):
+        if line.startswith('end_header'):
+            start_idx = idx + 1
+        if re.match(r'^\d+\s+\d+\s+\d+$', line):
+            end_idx = idx
+            break
 
-    min_low = min(x for x in data if x <= threshold) if any(x <= threshold for x in data) else threshold
-    max_high = max(x for x in data if x > threshold) if any(x > threshold for x in data) else threshold
+    # 解析和替换 hbond 列
+    for i, line in enumerate(lines[start_idx:end_idx]):
+        columns = line.split()
+        if len(columns) >= 5:
+            columns[4] = str(pc_score_list[i])
+        lines[start_idx + i] = ' '.join(columns) + '\n'
 
-    rescaled = []
-    for x in data:
-        if x <= threshold:
-            # 缩放到 [0, 0.5]
-            if threshold == min_low:
-                val = 0.5 if x == threshold else 0.0  # 避免除以0
-            else:
-                val = (x - min_low) / (threshold - min_low) * 0.5
-        else:
-            # 缩放到 [0.5, 1.0]
-            if max_high == threshold:
-                val = 1.0 if x == max_high else 0.5  # 避免除以0
-            else:
-                val = 0.5 + (x - threshold) / (max_high - threshold) * 0.5
-        rescaled.append(val)
+    # 写入新的 PLY 文件
+    with open(out_ply, 'w') as file:
+        file.writelines(lines)
+    print('done')
 
-    return rescaled
 
 def color_pre(input_ply_path, output_ply_path, probs, preds):
     probs = [-i for i in probs]
