@@ -68,6 +68,7 @@ def run_NB_craft(
         run_prottrans(seq_fasta, emb_out_path)
         surface_code = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/generate_surface.py')
         print('===================running surface calculation===================')
+        check_surf2spot_tools_dependency()
         subprocess.run(f"conda run -n surf2spot_tools python {surface_code} -i {output_dir} -o {output_dir} --probe {probe}", shell=True)
         atom_feature_engineering(output_dir)
         NB_surfpart(output_dir, domain_out_tsv, split_domain_length)
@@ -187,6 +188,7 @@ def run_HS_craft(
             run_prottrans(seq_fasta, emb_out_path)
             surface_code = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/generate_surface.py')
             print('===================running surface calculation===================')
+            check_surf2spot_tools_dependency()
             subprocess.run(f"conda run -n surf2spot_tools python {surface_code} -i {output_dir} -o {output_dir} --probe {probe}", shell=True)
             atom_feature_engineering(output_dir)
             HS_surfpart(output_dir, domain_out_dir, split_top_rate)
@@ -197,6 +199,7 @@ def run_HS_craft(
             run_prottrans(seq_fasta, emb_out_path)
             surface_code = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/generate_surface.py')
             print('===================running surface calculation===================')
+            check_surf2spot_tools_dependency()
             subprocess.run(f"conda run -n surf2spot_tools python {surface_code} -i {output_dir} -o {output_dir} --probe {probe}", shell=True)
             atom_feature_engineering(output_dir)
             NB_surfpart(output_dir, domain_out_tsv, split_domain_length)
@@ -232,3 +235,8 @@ def run_HS_draw(
     if path_exists(input_dir) and path_exists(output_dir):
         HS_draw(input_dir, output_dir)
 
+
+def check_surf2spot_tools_dependency():
+    if not os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/masif/extra_dependence')):
+        print(f"❌ '{dir_path}' Directory does not exist. Please configure MSMS(2.6.1), APBS(3.4.1) and PDB2PQR(2.1.1) to this directory correctly.")
+        sys.exit(1)  
