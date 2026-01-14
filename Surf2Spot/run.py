@@ -19,11 +19,11 @@ from Surf2Spot.draw.draw_predict_hsfilter import HS_draw
 
 
 def run_NB_preprocess(
-    input_dir: Path = typer.Option(..., "-i", "--input", help="输入pdb文件的目录"),
-    output_dir: Path = typer.Option(..., "-o", "--output", help="输出目录"),
-    esm_fasta: Path = typer.Option(None,"--esm", help="如需要esmfold预测，输入序列的fasta文件路径"),
-    domain_out_tsv: Path = typer.Option(None,'-ds',"--domain_split", help="输出的domain分割tsv"),
-    min_domain_length: int = typer.Option(30, "--min_domain_length", help="domain分割的最小长度阈值，默认为 30")
+    input_dir: Path = typer.Option(..., "-i", "--input", help="Input directory of pdb file."),
+    output_dir: Path = typer.Option(..., "-o", "--output", help="Output directory of preprocessed files."),
+    esm_fasta: Path = typer.Option(None,"--esm", help="Set the fasta file path of the input sequence if esmfold prediction is needed."),
+    domain_out_tsv: Path = typer.Option(None,'-ds',"--domain_split", help="The output path of domain segmentation result(.tsv)."),
+    min_domain_length: int = typer.Option(30, "--min_domain_length", help="Minimum length threshold of domain segmentation, which defaults to 30.")
 ):
     
     print('running NB-preprocess')
@@ -46,12 +46,12 @@ def run_NB_preprocess(
             
 
 def run_NB_craft(
-    output_dir: Path = typer.Option(..., "-i", help="输出目录"),
-    seq_fasta: Path = typer.Option(None,"-s", help="输出的序列路径，作为prottrans的输入"),
-    domain_out_tsv: Path = typer.Option(None, "-ds", "--domain_split", help="输入的domain分割tsv"),
-    emb_out_path: Path = typer.Option(None, "-emb", help="prottrans输出路径"),
-    split_domain_length: int = typer.Option(400,"--split_domain_length", help="进行domain分割的最小蛋白长度阈值，默认为 400"),
-    probe: float = typer.Option(5.0, "--probe", help="设置探针半径，默认为 5.0")
+    output_dir: Path = typer.Option(..., "-i", help="Output directory."),
+    seq_fasta: Path = typer.Option(None,"-s", help="Outputs the path of the sequence result as the input of prottrans."),
+    domain_out_tsv: Path = typer.Option(None, "-ds", "--domain_split", help="The input path of domain segmentation result(.tsv)."),
+    emb_out_path: Path = typer.Option(None, "-emb", help="The output path of ProtTrans embedding."),
+    split_domain_length: int = typer.Option(400,"--split_domain_length", help="The length threshold of the protein for domain segmentation or not, which defaults to 400."),
+    probe: float = typer.Option(5.0, "--probe", help="Set the probe radius, which is 5.0 by default.")
 ):
     
     print('running NB-craft')
@@ -75,11 +75,11 @@ def run_NB_craft(
 
 
 def run_NB_predict(
-    input_dir: Path = typer.Option(..., "-i", help="输入pdb文件的目录"),
-    output_dir: Path = typer.Option(..., "-o", help="输出目录"),
-    emb_path: Path = typer.Option(None, "-emb", "--emb_path", help="prottrans的输出"),
-    model_path: Path = typer.Option(...,"--model", help="模型权重"),
-    threshold: float = typer.Option(0.4,"--threshold", help="分割阈值") 
+    input_dir: Path = typer.Option(..., "-i", help="Input directory of pdb file."),
+    output_dir: Path = typer.Option(..., "-o", help="Output directory."),
+    emb_path: Path = typer.Option(None, "-emb", "--emb_path", help="The output path of ProtTrans embedding."),
+    model_path: Path = typer.Option(...,"--model", help="The model weight path."),
+    threshold: float = typer.Option(0.4,"--threshold", help="Segmentation threshold.") 
 ):
     print('running NB-predict')
 
@@ -92,8 +92,8 @@ def run_NB_predict(
 
 
 def run_NB_draw(
-    input_dir: Path = typer.Option(..., "-i", help="输入pdb文件的目录"),
-    output_dir: Path = typer.Option(..., "-o", help="输出目录"),
+    input_dir: Path = typer.Option(..., "-i", help="Input directory of pdb file."),
+    output_dir: Path = typer.Option(..., "-o", help="Output directory."),
 ):
     print('running NB-draw')
     if path_exists(input_dir) and path_exists(output_dir):
@@ -104,13 +104,13 @@ def run_NB_draw(
 
 
 def run_HS_preprocess(
-    input_dir: Path = typer.Option(..., "-i", "--input", help="输入pdb文件的目录"),
-    output_dir: Path = typer.Option(..., "-o", "--output", help="输出目录"),
-    esm_fasta: Path = typer.Option(None, "--esm", help="如需要esmfold预测，输入序列的fasta文件路径"),
-    domain_out_dir: Path = typer.Option(None, "-ds2", help="输出的domain分割dir"),
-    domain_out_tsv: Path = typer.Option(None, '-ds1', help="输出的domain分割tsv"),
-    min_domain_length: int = typer.Option(30, "--min_domain_length", help="domain分割的最小长度阈值，默认为 30"),
-    split_type: int = typer.Option(1, "--split", help="设置分割方法：1 --> chainsaw ; 2 --> gpsite")
+    input_dir: Path = typer.Option(..., "-i", "--input", help="Input directory of pdb file."),
+    output_dir: Path = typer.Option(..., "-o", "--output", help="Output directory."),
+    esm_fasta: Path = typer.Option(None, "--esm", help="Set the fasta file path of the input sequence if esmfold prediction is needed."),
+    domain_out_dir: Path = typer.Option(None, "-ds2", help="The output path of domain segmentation result(directory, GPSite)."),
+    domain_out_tsv: Path = typer.Option(None, '-ds1', help="The output path of domain segmentation result(.tsv, Chainsaw)."),
+    min_domain_length: int = typer.Option(30, "--min_domain_length", help="Minimum length threshold of domain segmentation, which defaults to 30."),
+    split_type: int = typer.Option(1, "--split", help="Set the segmentation method: 1 --> Chainsaw ; 2 --> GPSite.")
     
 ):
     print('running HS-preprocess')
@@ -156,15 +156,15 @@ def run_HS_preprocess(
             
 
 def run_HS_craft(
-    output_dir: Path = typer.Option(..., "-i", help="输出目录"),
-    domain_out_dir: Path = typer.Option(None, "-ds2", help="输出gpsite氨基酸得分目录"),
-    seq_fasta: Path = typer.Option(None, "-s", help="输出的序列路径，作为prottrans的输入"),
-    emb_out_path: Path = typer.Option(None, "-emb", "--emb_path", help="domain分割的最小长度阈值，默认为 30"),
-    split_top_rate: float = typer.Option(0.66, "--split_top_rate", help="选top百分之多少的进行进一步筛选"),
-    domain_out_tsv: Path = typer.Option(None, "-ds1", help="输入的domain分割tsv"),
-    split_domain_length: int = typer.Option(400,"--split_domain_length", help="进行domain分割的最小蛋白长度阈值，默认为 400"),
-    probe: float = typer.Option(5.0, "--probe", help="设置探针半径，默认为 5.0"),
-    split_type: int = typer.Option(1, "--split", help="设置分割方法：1 --> chainsaw ; 2 --> gpsite")
+    output_dir: Path = typer.Option(..., "-i", help="Output directory."),
+    domain_out_dir: Path = typer.Option(None, "-ds2", help="The output directory of gpsite amino acid score."),
+    seq_fasta: Path = typer.Option(None, "-s", help="Outputs the path of the sequence result as the input of prottrans."),
+    emb_out_path: Path = typer.Option(None, "-emb", "--emb_path", help="Minimum length threshold of domain segmentation, which defaults to 30."),
+    split_top_rate: float = typer.Option(0.66, "--split_top_rate", help="Select the top percentage for further screening(GPSite)."),
+    domain_out_tsv: Path = typer.Option(None, "-ds1", help="The input path of domain segmentation result(.tsv)."),
+    split_domain_length: int = typer.Option(400,"--split_domain_length", help="The length threshold of the protein for domain segmentation or not, which defaults to 400."),
+    probe: float = typer.Option(5.0, "--probe", help="Set the probe radius, which is 5.0 by default."),
+    split_type: int = typer.Option(1, "--split", help="Set the segmentation method: 1 --> Chainsaw ; 2 --> GPSite.")
 ):
     print('running HS-craft')
 
@@ -209,11 +209,11 @@ def run_HS_craft(
 
 
 def run_HS_predict(
-    input_dir: Path = typer.Option(..., "-i", help="输入pdb文件的目录"),
-    output_dir: Path = typer.Option(..., "-o", help="输出目录"),
-    emb_path: Path = typer.Option(None, "-emb", "--emb_path", help="prottrans的输出"),
-    model_path: Path = typer.Option(..., "--model", help="模型权重"),
-    threshold: float = typer.Option(0.4,"--threshold", help="分割阈值") 
+    input_dir: Path = typer.Option(..., "-i", help="Input directory of pdb file."),
+    output_dir: Path = typer.Option(..., "-o", help="Output directory."),
+    emb_path: Path = typer.Option(None, "-emb", "--emb_path", help=" output path of ProtTrans embedding."),
+    model_path: Path = typer.Option(..., "--model", help="The model weight path."),
+    threshold: float = typer.Option(0.4,"--threshold", help="Segmentation threshold.") 
 ):
     print('running HS-predict')
 
@@ -228,8 +228,8 @@ def run_HS_predict(
 
 
 def run_HS_draw(
-    input_dir: Path = typer.Option(..., "-i", help="输入pdb文件的目录"),
-    output_dir: Path = typer.Option(..., "-o", help="输出目录"),
+    input_dir: Path = typer.Option(..., "-i", help="Input directory of pdb file."),
+    output_dir: Path = typer.Option(..., "-o", help="Output directory."),
 ):
     print('running HS-draw')
     if path_exists(input_dir) and path_exists(output_dir):
