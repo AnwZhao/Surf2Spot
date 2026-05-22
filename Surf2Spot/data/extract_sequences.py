@@ -1,6 +1,8 @@
 import os
 from Bio import PDB
 import argparse
+import re
+import glob
 
 def extract_sequences_from_pdb(pdb_path, output_file):
     aa_dict = {'ALA':'A','CYS':'C', 'HIS':'H', 'ARG':'R', 'LYS':'K',
@@ -30,4 +32,34 @@ def extract_sequences_from_pdb(pdb_path, output_file):
     fasta_file.close()
 
 
+def process_esmpdb(folder_path, dry_run=False):
+    pattern = re.compile(r'^fold_(.+)_after_model_([0-4])_A\.pdb$')
+    all_files = glob.glob(os.path.join(folder_path, "fold_*_after_model_*_A.pdb"))
+
+    tag_dict = {}  # {tag: {'zero': path_or_None, 'others': [paths]}}
+    for file_path in all_files:
+        basename = os.path.basename(file_path)
+        match = pattern.match(basename)
+        if not match:
+            continue 
+        tag, num_str = match.groups()
+        num = int(num_str)
+        if tag not in tag_dict:
+            tag_dict[tag] = {'zero': None, 'others': []}
+        if num == 0:
+            tag_dict[tag]['zero'] = file_path
+        else:
+            tag_dict[tag]['others'].append(file_path)
+
+    results = {}
+    for tag, info in tag_dict.items():
+        zero_file = info['zero']
+        others = info['others']
+        target_path = os.path.join(folder_path, f"{tag}.pdb")
+        if os.path.exists(target_path) and not os.path.samefile(target_path, zero_file):
+            os.remove(target_path)
+
+        os.rename(zero_file, target_path)
+        for f in others:
+            os.remove(f)
 
