@@ -6,7 +6,7 @@ from Surf2Spot.tools.path_check import path_exists, mk_dir
 from Surf2Spot.data.get_domain import get_domain_tsv
 from Surf2Spot.data.preprocess_single_chain import get_single_chain
 from Surf2Spot.data.get_atom_feature import atom_feature_engineering
-from Surf2Spot.data.extract_sequences import extract_sequences_from_pdb
+from Surf2Spot.data.extract_sequences import extract_sequences_from_pdb, process_esmpdb
 from Surf2Spot.data.get_prottrans_embed import run_prottrans
 from Surf2Spot.data.get_surface_partzone_antighs import NB_surfpart
 from Surf2Spot.predict.get_data_list_antighs import NB_predict
@@ -41,6 +41,7 @@ def run_NB_preprocess(
             print('===================running esmfold===================')
             esm_code = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tools/predict_esm.py')
             subprocess.run(f"conda run -n surf2spot_tools python {esm_code} -i {esm_fasta} -o {input_dir} ", shell=True)
+            process_esmpdb(input_dir)
             get_single_chain(input_dir, output_dir)
             get_domain_tsv(output_dir, domain_out_tsv, min_domain_length)
             
@@ -133,6 +134,7 @@ def run_HS_preprocess(
                 print('===================running esmfold===================')
                 esm_code = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tools/predict_esm.py')
                 subprocess.run(f"conda run -n surf2spot_tools python {esm_code} -i {esm_fasta} -o {input_dir} ", shell=True)
+                process_esmpdb(input_dir)
                 get_single_chain(input_dir, output_dir)
                 get_gpsite_split(output_dir, domain_out_dir)
 
