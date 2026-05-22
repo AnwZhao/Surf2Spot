@@ -34,25 +34,29 @@ Surf2Spot relies on external software/libraries to handle protein databank files
     ```shell
     bash download.sh
     ```
-    
+    Add the following path to the environment. `~/.bashrc`
+    ```shell
+     echo "$(pwd)/Surf2Spot/data/feature_extraction" >> ~/.bashrc
+    ```
     
 2. Prepare the environment
 We recommend using conda to substantially facilitate installation of all Python dependencies. 
 Cuda version 11.8 and above is required. 
 In order to avoid environmental conflicts, two different conda environments need to be built. Considering the version problems of some installation packages, please install python versions 3.7 and 3.9 respectively.
    ```shell
-    conda  create  -n  surf2spot_tools  python=3.7    
+    conda  create  -n  surf2spot_tools  python=3.7
+    conda activate surf2spot_tools
     pip  install  "fair-esm[esmfold]"  
     pip  install  git+https://github.com/facebookresearch/esm.git  
     pip  install  'dllogger @ git+https://github.com/NVIDIA/dllogger.git'  
     pip  install  'openfold @ git+https://github.com/aqlaboratory/openfold.git@4b41059694619831a7db195b7e0988fc4ff3a307'   
-    conda  install  -c  conda-forge  pymesh2  
     pip  install  scipy  biopython  rdkit  plyfile  IPython  joblib  
     pip  install  https://github.com/PyMesh/PyMesh/releases/download/v0.3/pymesh2-0.3-cp37-cp37m-linux_x86_64.whl
    ```
 
    ```shell
-    conda  create  -n  surf2spot  python=3.9  
+    conda  create  -n  surf2spot  python=3.9
+    conda activate surf2spot
     pip  install  torch==2.1.1  torchvision==0.16.1  torchaudio==2.1.1  --index-url  https://download.pytorch.org/whl/cu118  
     conda  install  -c  conda-forge  pymol-open-source=3.0.0
     conda install -c ostrokach dssp
