@@ -1,6 +1,6 @@
 # Surf2Spot: A Geometric Model for Prediction of Epitope and Binding Sites on Target Protein
 
-![Surf2Spot Logo](Surf2Spot/fig.1.jpg)
+![Surf2Spot Logo](Surf2Spot/GRAPHICAL_ABSTRACT.jpg)
 Surf2Spot is a protein binding site prediction software based on deep learning, which is specially designed to identify protein-protein interaction hotspots (PPI hotspots) and nano-antibody-antigen binding sites (NAI epitopes). The software innovatively combines protein surface point cloud data with dynamic graph convolutional neural network (DGCNN), and accurately predicts the binding sites by uniformly sampling protein surface and coding its spatial and physical and chemical properties. 
 Surf2Spot adopts point cloud modeling strategy to effectively identify solvent exposed residues and filter out buried residues, thus improving prediction accuracy and optimizing calculation efficiency. This tool is dedicated to providing theoretical support and target screening basis for rational design of protein binding molecules and nano-antibodies.
 
