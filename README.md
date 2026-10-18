@@ -173,6 +173,6 @@ If it's inconvenient for you to preprocess the data, we also provided the [proce
 ## Citing this work
 
 ```bibtex
-
+Anwen Zhao, Yu Li, Zixuan Wang, Tianhao Wu, Ran Fu, Yuxuan Lou, Yanfen Xu, Xuliang Han, Wenying Wang, Jun Yan, Xiangfeng Wang, Surf2Spot: a surface-informed geometry-aware model for predicting partner-independent binder and nanobody design hotspots, Briefings in Bioinformatics, Volume 27, Issue 5, September 2026, bbag542, https://doi.org/10.1093/bib/bbag542
 ```
 
